@@ -40,7 +40,7 @@ const updateRoomStatus  = async (req, res, dic) => {
 }
 
 const deleteRoomStatus  = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('DELETE FROM tblroomstatus WHERE rsRoomStatusID = ?',[req.params.id]).catch(err => {
+    const [rows3, fields3] = await connection_promise.query('DELETE FROM tblroomstatus WHERE rsRoomStatusID = ?',[req.params.id]).catch(err => {
         throw err;
     })
 

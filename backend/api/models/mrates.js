@@ -40,7 +40,7 @@ const updateRates  = async (req, res, dic) => {
 }
 
 const deleteRates  = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('DELETE FROM tblrates WHERE rRateID = ?',[req.params.id]).catch(err => {
+    const [rows3, fields3] = await connection_promise.query('DELETE FROM tblrates WHERE rRateID = ?',[req.params.id]).catch(err => {
         throw err;
     })
 

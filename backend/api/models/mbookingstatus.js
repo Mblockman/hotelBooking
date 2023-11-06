@@ -52,7 +52,7 @@ const updateBookingstatus  = async (req, res, dic) => {
 }
 
 const deleteBookingstatus  = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('DELETE FROM tblbookingstatus WHERE bsBookingStatusID = ?',[req.params.id]).catch(err => {
+    const [rows3, fields3] = await connection_promise.query('DELETE FROM tblbookingstatus WHERE bsBookingStatusID = ?',[req.params.id]).catch(err => {
         throw err;
     })
     res.status(200).json(rows3)    

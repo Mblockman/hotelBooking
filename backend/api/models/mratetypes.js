@@ -40,7 +40,7 @@ const updateRateTypes  = async (req, res, dic) => {
 }
 
 const deleteRateTypes  = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('DELETE FROM tblratetypes WHERE rtRateTypeID = ?',[req.params.id]).catch(err => {
+    const [ows3, fields3] = await connection_promise.query('DELETE FROM tblratetypes WHERE rtRateTypeID = ?',[req.params.id]).catch(err => {
         throw err;
     })
 

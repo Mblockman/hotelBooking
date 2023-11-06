@@ -52,12 +52,19 @@ const updateHotel  = async (req, res, dic) => {
 }
 
 const deleteHotel  = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('DELETE FROM tblhotels WHERE hHotelID = ?',[req.params.id]).catch(err => {
+    const [rows3, fields1] = await connection_promise.query('SELECT count(*) as COUNT FROM tblhotels WHERE hHotelID = ?',[req.params.id]).catch(err => {
         throw err;
-    })
-    res.status(200).json(rows3)    
+    });
+    console.log(rows3)
+    if (rows3.COUNT != 0){
+        console.log(req.body);
+        const [rows3, fields3] = await connection_promise.query('DELETE FROM tblhotels WHERE hHotelID = ?',[req.params.id]).catch(err => {
+            throw err; 
+        })
+       //return res.status(200).json({ code: 0, des: '삭제성공!' }) ;
+       res.status(200).json(rows3)
+    }
 }
-
 module.exports = {
     getHotelsList,
     getHotelsID,

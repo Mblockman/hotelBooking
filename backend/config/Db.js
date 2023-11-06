@@ -1,14 +1,18 @@
 
 const mysql = require('mysql2');
-
+require('dotenv').config();
 /**
  * Create mysql database pool on localhost
  */
 module.exports = mysql.createPool({
-    host: "127.0.0.1",
-    user: "root",
-    password: "password",
-    database: "hotelbooking",
+    //host: "127.0.0.1",
+    //user: "root",
+    //password: "password",
+    //database: "hotelbooking",
+    host:process.env.HOST || 'localhost',
+    user:process.env.USERDB || 'root',
+    password:process.env.PASSWORD || 'password',
+    database:process.env.DATABASE || 'hotelbooking',
     port: "3306",
     charset: "utf8", // Default database encode
     // acquireTimeout: 10000, // get connection Millisecond
