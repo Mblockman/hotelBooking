@@ -1,6 +1,7 @@
 const my_connection = require('../../config/Db.js');
 const connection_promise = my_connection.promise();
 
+let insertID=0;
 const resParam = {
     code: 0,
     data: [],
@@ -25,16 +26,31 @@ const getGuestsID = async (req, res, dic) => {
     res.status(200).json(rows2)    
 }
 
-const createGuests = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('SELECT count(*) as COUNT FROM tblGuests WHERE gCellularNumber = ?',[req.body.hMainPhoneNumber]).catch(err => {
+const getGuestsEmail = async (req, res, dic) => {
+    //console.log(req.params.email);
+    const [rows2, fields2] = await connection_promise.query('SELECT gGuestID FROM tblGuests WHERE geMailAddress = ?',[req.params.email]).catch(err => {
         throw err;
+        
     })
+    //insertID = rows2.getGuestsID;
+    //console.log("--------------");
+    //console.log("--------------");
+    res.status(200).json(rows2)    
+}
+
+const createGuests = async (req, res, dic) => {
+    const [[rows3], fields3] = await connection_promise.query('SELECT count(*) as COUNT FROM tblGuests WHERE geMailAddress = ?',[req.body.geMailAddress]).catch(err => {
+        throw err;
+    });
+    //console.log(rows3);
     if (rows3.COUNT == 0){
-        console.log(req.body);
+        //console.log(req.body);
         const [rows3, fields3] = await connection_promise.query('INSERT INTO tblGuests SET ?',[req.body]).catch(err => {
             throw err;
         })
     }
+    console.log("--------------");
+    console.log(res);
     res.status(200).json(rows3)    
 }
 
@@ -61,7 +77,9 @@ const deleteGuests  = async (req, res, dic) => {
 module.exports = {
     getGuestsList,
     getGuestsID,
+    getGuestsEmail,
     createGuests,
     updateGuests,
     deleteGuests,
+    insertID,
 }

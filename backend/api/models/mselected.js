@@ -81,7 +81,7 @@ const getReservationTypeCount = async  (req, res, dic) => {
         GROUP BY rt.rtRoomType  
         ORDER BY rt.rtRoomTypeID
     `;
-    console.log(req.body.DateTo);
+    //console.log(req.body);
     const [rows1, fields1] = await connection_promise.query(selectReservationQuery,[req.body.DateTo, req.body.DateFrom,req.body.DateTo, req.body.DateFrom,req.body.RoomTypeID ]).catch(err => {
         throw err;
     })
@@ -106,7 +106,7 @@ const getReservationTypeList = async  (req, res, dic) => {
         GROUP BY rt.rtRoomType  
         ORDER BY rt.rtRoomTypeID
     `;
-    console.log(req.body.DateTo);
+    //console.log(req.body.DateTo);
     const [rows1, fields1] = await connection_promise.query(selectReservationQuery,[req.body.DateTo, req.body.DateFrom,req.body.DateTo, req.body.DateFrom ]).catch(err => {
         throw err;
     })
@@ -165,6 +165,92 @@ const getNotRoomList = async  (req, res, dic) => {
     //res.status(200).json(resParam);
     res.status(200).json(rows1)
 }
+
+const totalbooking = async (req, res, dic) => {
+    var querydata = {};
+    querydata.FromDate = req.body.FromDate;
+    querydata.ToDate = req.body.ToDate;
+    querydata.RoomType = req.body.RoomType;
+    delete req.body.FromDate;
+    delete req.body.ToDate;
+    delete req.body.RoomType; 
+    let insertguestid = 0; 
+    let insertbookingid = 0;
+    let insertrate = 0;
+    var buffer = {};
+    console.log(req.body);
+    console.log(querydata.FromDate, ', ',querydata.ToDate, ', ', querydata.RoomType);
+    const [[rows3], fields3] = await connection_promise.query('SELECT count(*) as COUNT FROM tblGuests WHERE geMailAddress = ?',[req.body.geMailAddress]).catch(err => {
+        throw err;
+    });
+    if (rows3.COUNT == 0){
+        const [rows3, fields3] = await connection_promise.query('INSERT INTO tblGuests SET ?',[req.body]).catch(err => {
+            console.log('ERROR APPEAR *********');
+            throw err;
+        })
+        insertguestid = rows3.insertId;
+        console.log('**************************',insertguestid);
+    }
+    if(insertguestid == 0){
+        const [[rows3], fields3] = await connection_promise.query('SELECT gGuestID FROM tblGuests WHERE geMailAddress = ?',[req.body.geMailAddress]).catch(err => {
+            throw err;
+        });        
+        insertguestid = rows3.gGuestID;
+    }
+    // 조회가 안될때 처리
+    if(insertguestid == 0) {return res.status(404)};
+    buffer = {};
+    buffer.bHotelID = '1';
+    buffer.bGuestID = insertguestid;
+    buffer.bReservationAgentID = null;
+    buffer.bDateFrom = querydata.FromDate;
+    buffer.bDateTo = querydata.ToDate;
+    buffer.bRoomCount = '1';
+    buffer.bBookingStatusID = '2';
+    console.log(buffer);
+    const [rows4, fields4] = await connection_promise.query('INSERT INTO tblbookings SET ?',[buffer]).catch(err => {
+        throw err;
+    })  
+    insertbookingid = rows4.insertId;
+    if(insertbookingid == 0){
+        const [rows2, fields2] = await connection_promise.query('SELECT bBookingID FROM tblbookings WHERE bGuestID = ? and bDateFrom = ? and bDateTo = ?',[buffer.bGuestID, buffer.bDateFrom, buffer.bDateTo]).catch(err => {
+            throw err;
+        })
+        insertbookingid = rows2.bBookingID;
+    }
+    if(insertbookingid == 0) {return res.status(404);}
+
+    const selectReservationQuery = `
+        select distinct t3.rtRoomType, t2.rRate, t2.rFromDate, t2.rToDate, t2.rRateTypeID, t4.rtRateType, t4.rtDescription 
+            from tblrooms t1, tblrates t2, tblroomtypes t3, tblratetypes t4 
+            where t3.rtRoomTypeID = ?
+            and t1.rRoomTypeID = t3.rtRoomTypeID
+            and t1.rRoomsID = t2.rRoomID 
+            and t2.rRateTypeID = t4.rtRateTypeID 
+            and t2.rFromDate < cast(concat(?, ' 15:00:00') as datetime)
+            and t2.rToDate > cast(concat(?, ' 10:00:00') as datetime)
+            and t1.rHotelID = (select t.hHotelID from tblhotels t where t.hMain = true)
+    `;
+    const [[rows5], fields5] = await connection_promise.query(selectReservationQuery,[querydata.RoomType, querydata.FromDate,querydata.ToDate]).catch(err => {
+        throw err;
+    })
+    console.log(rows5);
+    console.log(rows5.rRate);
+    insertrate = rows5.rRate;
+    if(insertrate == 0) res.status(405);
+    buffer = {};
+    buffer.rbBookingID = insertbookingid;
+    buffer.rbRoomID = null;
+    buffer.rbRate = insertrate;
+    buffer.rbRoomType = querydata.RoomType;
+    console.log(buffer);
+    const [rows1, fields1] = await connection_promise.query('INSERT INTO tblroomsbooked SET ?',[buffer]).catch(err => {
+        throw err;
+        
+    })
+    res.status(200).json(rows1)    
+}
+
 module.exports = {
     getReservationOne,
     getReservationList,
@@ -172,4 +258,5 @@ module.exports = {
     getReservationTypeList,
     getRate,
     getNotRoomList,
+    totalbooking,
 }
