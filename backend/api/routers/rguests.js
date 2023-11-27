@@ -10,7 +10,12 @@ guestsRouter.get('/:id', function(req, res){
     guestsModel.getGuestsID(req, res);
 })
 
+guestsRouter.get('/email/:email', function(req, res){
+    guestsModel.getGuestsEmail(req, res);
+})
+
 guestsRouter.post('/', function(req, res){
+    //console.log(req.body);
     guestsModel.createGuests(req, res);
 })
 

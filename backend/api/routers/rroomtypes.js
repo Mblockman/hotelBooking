@@ -10,6 +10,10 @@ roomtypesRouter.get('/:id', function(req, res){
     RoomTypesModel.getRoomTypesID(req, res);
 })
 
+roomtypesRouter.get('/name/:name', function(req, res){
+    RoomTypesModel.getRoomTypesName(req, res);
+})
+
 roomtypesRouter.post('/', function(req, res){
     RoomTypesModel.createRoomTypes(req, res);
 })
