@@ -26,9 +26,11 @@ const getBookedID = async (req, res, dic) => {
 }
 
 const createBooked = async (req, res, dic) => {
-    const [[rows3], fields3] = await connection_promise.query('INSERT INTO tblroomsbooked SET ?',[req.body]).catch(err => {
+    const [rows3, fields3] = await connection_promise.query('INSERT INTO tblroomsbooked SET ?',[req.body]).catch(err => {
         throw err;
+        
     })
+    console.log(rows3.insertId);
     res.status(200).json(rows3)    
 }
 

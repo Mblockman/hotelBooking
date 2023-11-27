@@ -24,7 +24,13 @@ const getRoomTypesID = async (req, res, dic) => {
     })
     res.status(200).json(rows2)    
 }
-
+const getRoomTypesName = async (req, res, dic) => {
+    console.log(req.params);
+    const [rows2, fields2] = await connection_promise.query('SELECT * FROM tblRoomtypes WHERE rtRoomType = ?',[req.params.name]).catch(err => {
+        throw err;
+    })
+    res.status(200).json(rows2)    
+}
 const createRoomTypes = async (req, res, dic) => {
     const [[rows3], fields3] = await connection_promise.query('INSERT INTO tblroomtypes SET ?',[req.body]).catch(err => {
         throw err;
@@ -50,6 +56,7 @@ const deleteRoomTypes  = async (req, res, dic) => {
 module.exports = {
     getRoomTypesList,
     getRoomTypesID,
+    getRoomTypesName,
     createRoomTypes,
     updateRoomTypes,
     deleteRoomTypes,
